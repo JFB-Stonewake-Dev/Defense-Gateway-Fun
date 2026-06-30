@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
-import pool from '@/lib/db';
+import { supabase } from '@/lib/db';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -29,13 +29,18 @@ export const authOptions: NextAuthOptions = {
           const userId = robloxUser.id;
           const username = robloxUser.name;
 
+          // Fetch actual avatar
+          const thumbRes = await fetch(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=420x420&format=Png&isCircular=false`);
+          const thumbData = await thumbRes.json();
+          const avatarUrl = thumbData.data?.[0]?.imageUrl || '';
+
           return {
             id: userId.toString(),
             name: username,
-            image: `https://tr.rbxcdn.com/38c6edcb50633730ff4cf39ac8859840/420/420/AvatarHeadshot/Png` // Fallback thumbnail format, client will fetch proper if needed
+            image: avatarUrl
           };
         } catch (e) {
-          console.error(e);
+          console.error("Authorize error:", e);
           return null;
         }
       }
@@ -63,28 +68,27 @@ export const authOptions: NextAuthOptions = {
             if (policeGroup) policeRank = policeGroup.role.rank;
           }
           
-          const client = await pool.connect();
-          try {
-            const res = await client.query(`
-              INSERT INTO public.users (roblox_id, username, main_group_rank, police_group_rank)
-              VALUES ($1, $2, $3, $4)
-              ON CONFLICT (roblox_id) DO UPDATE SET 
-                username = EXCLUDED.username,
-                main_group_rank = EXCLUDED.main_group_rank,
-                police_group_rank = EXCLUDED.police_group_rank
-              RETURNING id, is_flagged, main_group_rank, police_group_rank
-            `, [user.id, user.name, mainRank, policeRank]);
-            
-            const dbUser = res.rows[0];
+          const { data: dbUser, error } = await supabase
+            .from('users')
+            .upsert({
+              roblox_id: user.id,
+              username: user.name,
+              main_group_rank: mainRank,
+              police_group_rank: policeRank
+            }, { onConflict: 'roblox_id' })
+            .select('id, is_flagged, main_group_rank, police_group_rank')
+            .single();
+
+          if (error) {
+            console.error("Supabase upsert error:", error);
+          } else if (dbUser) {
             token.dbId = dbUser.id;
             token.mainRank = dbUser.main_group_rank;
             token.policeRank = dbUser.police_group_rank;
             token.isFlagged = dbUser.is_flagged;
-          } finally {
-            client.release();
           }
         } catch(err) {
-          console.error("Error fetching Roblox groups or DB upsert:", err);
+          console.error("Error fetching Roblox groups or Supabase upsert:", err);
         }
       }
       return token;

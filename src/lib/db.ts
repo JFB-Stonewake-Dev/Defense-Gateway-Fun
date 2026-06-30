@@ -1,13 +1,6 @@
-import { Pool } from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
-declare global {
-  var pgPool: Pool | undefined;
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-const pool = global.pgPool || new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-if (process.env.NODE_ENV !== 'production') global.pgPool = pool;
-
-export default pool;
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
