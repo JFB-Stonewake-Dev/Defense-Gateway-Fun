@@ -31,6 +31,14 @@ export default function Sidebar() {
         
         {status === 'authenticated' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <Link href="/dashboard" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>COMMAND CENTER</Link>
+              <Link href="/dashboard/ops" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>OPERATIONS BOARD</Link>
+              <Link href="/dashboard/armoury" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>ARMOURY LEDGER</Link>
+              <Link href="/dashboard/logistics" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>ASSET LEDGER</Link>
+              <Link href="/dashboard/police" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>POLICE BLOTTER</Link>
+              <Link href="/dashboard/intel" className="btn" style={{ textAlign: 'left', textDecoration: 'none', color: 'var(--accent-red)', borderColor: 'var(--accent-red)' }}>G2 INTELLIGENCE</Link>
+            </nav>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <img 
                 src={session.user?.image || ''} 
