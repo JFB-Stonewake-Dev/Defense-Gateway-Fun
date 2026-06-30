@@ -1,39 +1,54 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from "next-auth/providers/credentials";
 import pool from '@/lib/db';
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    {
-      id: "roblox",
-      name: "Roblox",
-      type: "oauth",
-      clientId: process.env.ROBLOX_CLIENT_ID,
-      clientSecret: process.env.ROBLOX_CLIENT_SECRET,
-      wellKnown: "https://apis.roblox.com/oauth/.well-known/openid-configuration",
-      authorization: { params: { scope: "openid profile" } },
-      idToken: true,
-      checks: ["pkce", "state"],
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.preferred_username,
-          image: profile.picture,
-        }
+    CredentialsProvider({
+      name: "Roblox Username",
+      credentials: {
+        username: { label: "Roblox Username", type: "text", placeholder: "e.g. Builderman" }
       },
-    }
+      async authorize(credentials) {
+        if (!credentials?.username) return null;
+        
+        try {
+          // 1. Get Roblox ID from username
+          const userRes = await fetch('https://users.roblox.com/v1/usernames/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usernames: [credentials.username], excludeBannedUsers: true })
+          });
+          const userData = await userRes.json();
+          
+          if (!userData.data || userData.data.length === 0) {
+            return null; // User not found
+          }
+          
+          const robloxUser = userData.data[0];
+          const userId = robloxUser.id;
+          const username = robloxUser.name;
+
+          return {
+            id: userId.toString(),
+            name: username,
+            image: `https://tr.rbxcdn.com/38c6edcb50633730ff4cf39ac8859840/420/420/AvatarHeadshot/Png` // Fallback thumbnail format, client will fetch proper if needed
+          };
+        } catch (e) {
+          console.error(e);
+          return null;
+        }
+      }
+    })
   ],
-  session: {
-    strategy: 'jwt'
-  },
+  session: { strategy: 'jwt' },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
-      // user is only defined on the first sign in
       if (user) {
         token.robloxId = user.id;
         
         try {
-          // Fetch user's Roblox group ranks
           const groupsRes = await fetch(`https://groups.roblox.com/v2/users/${user.id}/groups/roles`);
           const groupsData = await groupsRes.json();
           
@@ -48,7 +63,6 @@ export const authOptions: NextAuthOptions = {
             if (policeGroup) policeRank = policeGroup.role.rank;
           }
           
-          // Upsert into Supabase database using pg pool
           const client = await pool.connect();
           try {
             const res = await client.query(`
