@@ -40,7 +40,7 @@ export default function Sidebar() {
               <div>
                 <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{session.user?.name}</div>
                 <div style={{ fontSize: '0.75rem', color: (session.user as any)?.mainRank > 0 ? 'var(--accent-blue)' : 'var(--text-muted)' }}>
-                  Main Rank: {(session.user as any)?.mainRank || 'None'}
+                  {(session.user as any)?.mainRole || 'Rank: None'}
                 </div>
               </div>
             </div>

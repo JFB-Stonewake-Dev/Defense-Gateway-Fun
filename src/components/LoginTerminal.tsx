@@ -5,13 +5,26 @@ import { useState } from 'react';
 
 export default function LoginTerminal() {
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username) return;
+    if (!username || !password) {
+      setError('USERNAME AND PASSWORD REQUIRED');
+      return;
+    }
+    setError('');
     setLoading(true);
-    await signIn('credentials', { username, callbackUrl: '/dashboard' });
+    const res = await signIn('credentials', { username, password, redirect: false });
+    
+    if (res?.error) {
+      setError('ACCESS DENIED: INVALID CREDENTIALS OR ACCOUNT NOT FOUND');
+      setLoading(false);
+    } else {
+      window.location.href = '/dashboard';
+    }
   };
 
   return (
@@ -28,7 +41,7 @@ export default function LoginTerminal() {
         
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', maxWidth: '300px', marginBottom: '0.5rem', lineHeight: '1.6' }}>
-            Identity verification required. Enter your Roblox username to pull your MoD service record.
+            Identify yourself. If this is your first time, the system will register the password you enter.
           </p>
           
           <input 
@@ -49,7 +62,28 @@ export default function LoginTerminal() {
             }}
           />
 
-          <button type="submit" className="btn btn-primary" disabled={loading || !username} style={{ width: '100%', maxWidth: '250px', marginTop: '0.5rem' }}>
+          <input 
+            type="password" 
+            placeholder="Password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              border: '1px solid var(--accent-blue)',
+              color: 'var(--accent-blue)',
+              padding: '0.75rem',
+              fontFamily: 'var(--font-mono)',
+              width: '100%',
+              maxWidth: '250px',
+              textAlign: 'center',
+              outline: 'none',
+              letterSpacing: '0.2em'
+            }}
+          />
+
+          {error && <div style={{ color: 'var(--accent-red)', fontSize: '0.75rem', fontFamily: 'var(--font-mono)', marginTop: '0.5rem' }}>{error}</div>}
+
+          <button type="submit" className="btn btn-primary" disabled={loading || !username || !password} style={{ width: '100%', maxWidth: '250px', marginTop: '0.5rem' }}>
             {loading ? 'AUTHENTICATING...' : 'VERIFY IDENTITY'}
           </button>
         </form>
