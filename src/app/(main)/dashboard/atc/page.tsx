@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useRadarSimulation, Flight } from './useRadarSimulation';
+import { useRadarData, Flight } from './useRadarSimulation';
 
 export default function ATCPage() {
-  const { flights, updateFlightCommand } = useRadarSimulation();
+  const { flights, updateFlightCommand } = useRadarData();
   const [selectedFlightId, setSelectedFlightId] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
