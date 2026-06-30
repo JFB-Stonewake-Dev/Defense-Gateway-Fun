@@ -10,11 +10,14 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)' }}>
-        <h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '1.125rem', margin: 0, color: 'var(--text-primary)' }}>DEFENCE GATEWAY</h2>
-        <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '0.25rem' }}>ISLAND OPS HUB v1.0</div>
+        <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: '1.25rem', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>Defence Gateway</h2>
+        <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.25rem' }}>Island Ops Hub v1.0</div>
       </div>
       
-      <nav style={{ padding: '1rem 0', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <nav style={{ padding: '1.5rem 1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem', paddingLeft: '0.75rem' }}>
+          Navigation
+        </div>
         <SidebarLink href="/dashboard" label="Dashboard" currentPath={pathname} />
         <SidebarLink href="/armoury" label="Armoury Ledger" currentPath={pathname} />
         <SidebarLink href="/ops" label="Operations Board" currentPath={pathname} />
@@ -25,41 +28,36 @@ export default function Sidebar() {
       </nav>
 
       <div style={{ marginTop: 'auto', padding: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
-        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-          {status === 'authenticated' ? 'Logged in as' : 'Authentication'}
-        </div>
-        
         {status === 'authenticated' ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <Link href="/dashboard" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>COMMAND CENTER</Link>
-              <Link href="/dashboard/ops" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>OPERATIONS BOARD</Link>
-              <Link href="/dashboard/armoury" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>ARMOURY LEDGER</Link>
-              <Link href="/dashboard/logistics" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>ASSET LEDGER</Link>
-              <Link href="/dashboard/police" className="btn" style={{ textAlign: 'left', textDecoration: 'none' }}>POLICE BLOTTER</Link>
-              <Link href="/dashboard/intel" className="btn" style={{ textAlign: 'left', textDecoration: 'none', color: 'var(--accent-red)', borderColor: 'var(--accent-red)' }}>G2 INTELLIGENCE</Link>
-            </nav>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <img 
                 src={session.user?.image || ''} 
                 alt="Avatar" 
-                style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)' }} 
+                style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--bg-tertiary)' }} 
               />
-              <div>
-                <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{session.user?.name}</div>
+              <div style={{ overflow: 'hidden' }}>
+                <div style={{ fontWeight: 500, fontSize: '0.875rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                  {session.user?.name}
+                </div>
                 <div style={{ fontSize: '0.75rem', color: (session.user as any)?.mainRank > 0 ? 'var(--accent-blue)' : 'var(--text-muted)' }}>
                   {(session.user as any)?.mainRole || 'Rank: None'}
                 </div>
               </div>
             </div>
-            <button className="btn btn-outline" onClick={() => signOut()} style={{ width: '100%', fontSize: '0.75rem', padding: '0.35rem' }}>
+            <button className="btn btn-outline" onClick={() => signOut()} style={{ width: '100%' }}>
               Sign Out
             </button>
           </div>
         ) : (
-          <button className="btn btn-primary" onClick={() => signIn('roblox')} style={{ width: '100%' }}>
-            ROBLOX SECURE LOGIN
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+              Authentication Required
+            </div>
+            <button className="btn btn-primary" onClick={() => signIn('roblox')} style={{ width: '100%' }}>
+              Secure Login
+            </button>
+          </div>
         )}
       </div>
     </aside>
@@ -74,20 +72,26 @@ function SidebarLink({ href, label, currentPath }: { href: string, label: string
       href={href} 
       style={{ 
         display: 'block', 
-        padding: '0.75rem 1.5rem', 
-        color: isActive ? 'white' : 'var(--text-secondary)', 
-        backgroundColor: isActive ? 'var(--bg-tertiary)' : 'transparent',
-        borderLeft: isActive ? '3px solid var(--accent-blue)' : '3px solid transparent',
+        padding: '0.625rem 0.75rem', 
+        color: isActive ? 'var(--accent-blue)' : 'var(--text-secondary)', 
+        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+        borderRadius: '6px',
         textDecoration: 'none',
         fontSize: '0.875rem',
-        fontWeight: isActive ? 600 : 500,
-        transition: 'all 0.15s ease'
+        fontWeight: isActive ? 500 : 400,
+        transition: 'all 0.2s ease'
       }}
       onMouseOver={(e) => {
-        if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+          e.currentTarget.style.color = 'var(--text-primary)';
+        }
       }}
       onMouseOut={(e) => {
-        if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+        if (!isActive) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+          e.currentTarget.style.color = 'var(--text-secondary)';
+        }
       }}
     >
       {label}
