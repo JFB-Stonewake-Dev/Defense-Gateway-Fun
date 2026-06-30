@@ -19,12 +19,12 @@ export default function Sidebar() {
           Navigation
         </div>
         <SidebarLink href="/dashboard" label="Dashboard" currentPath={pathname} />
-        <SidebarLink href="/armoury" label="Armoury Ledger" currentPath={pathname} />
-        <SidebarLink href="/ops" label="Operations Board" currentPath={pathname} />
-        <SidebarLink href="/police" label="Watch Log (SP)" currentPath={pathname} />
-        <SidebarLink href="/logistics" label="Asset Ledger" currentPath={pathname} />
-        <SidebarLink href="/intelligence" label="G2 Intelligence" currentPath={pathname} />
-        <SidebarLink href="/jpa" label="JPA Profiles" currentPath={pathname} />
+        <SidebarLink href="/dashboard/armoury" label="Armoury Ledger" currentPath={pathname} />
+        <SidebarLink href="/dashboard/ops" label="Operations Board" currentPath={pathname} />
+        <SidebarLink href="/dashboard/police" label="Watch Log (SP)" currentPath={pathname} />
+        <SidebarLink href="/dashboard/logistics" label="Asset Ledger" currentPath={pathname} />
+        <SidebarLink href="/dashboard/intel" label="G2 Intelligence" currentPath={pathname} />
+        <SidebarLink href="/dashboard/jpa" label="JPA Profiles" currentPath={pathname} />
       </nav>
 
       <div style={{ marginTop: 'auto', padding: '1.5rem', borderTop: '1px solid var(--border-color)' }}>
